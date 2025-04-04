@@ -1,4 +1,4 @@
-from app.models.user import User
+from app.models.models import User
 from app.schemas.user import UserCreate
 from sqlalchemy.ext.asyncio import AsyncSession
 
