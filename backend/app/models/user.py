@@ -14,6 +14,12 @@ class User(Base):
     created_at = Column(TIMESTAMP, server_default=func.now())
     google_id = Column(Text, unique=True, nullable=True)
 
+    study_sessions = relationship("StudySession", back_populates="user")
+    timers = relationship("Timer", back_populates="user")
+    stopwatches = relationship("Stopwatch", back_populates="user")
+    rewards = relationship("UserReward", back_populates="user")
+    settings = relationship("UserSettings", back_populates="user", uselist=False)
+
 # 2. StudySession
 class StudySession(Base):
     __tablename__ = "study_sessions"
@@ -29,6 +35,8 @@ class StudySession(Base):
         CheckConstraint("type IN ('pomodoro', 'stopwatch')", name="study_type_check"),
     )
 
+    user = relationship("User", back_populates="study_sessions")
+
 # 3. Timer
 class Timer(Base):
     __tablename__ = "timers"
@@ -43,6 +51,8 @@ class Timer(Base):
         CheckConstraint("status IN ('running', 'paused', 'stopped')", name="timer_status_check"),
     )
 
+    user = relationship("User", back_populates="timers")
+
 # 4. Stopwatch
 class Stopwatch(Base):
     __tablename__ = "stopwatches"
@@ -53,6 +63,8 @@ class Stopwatch(Base):
     end_time = Column(TIMESTAMP, nullable=True)
     duration = Column(Interval, nullable=True)
 
+    user = relationship("User", back_populates="stopwatches")
+
 # 5. Reward
 class Reward(Base):
     __tablename__ = "rewards"
@@ -62,6 +74,8 @@ class Reward(Base):
     description = Column(Text)
     threshold_minutes = Column(Integer, nullable=False)
 
+    users = relationship("UserReward", back_populates="reward")
+
 # 6. UserReward
 class UserReward(Base):
     __tablename__ = "user_rewards"
@@ -70,6 +84,9 @@ class UserReward(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     reward_id = Column(Integer, ForeignKey("rewards.id"), nullable=False)
     achieved_at = Column(TIMESTAMP, server_default=func.now())
+
+    user = relationship("User", back_populates="rewards")
+    reward = relationship("Reward", back_populates="users")
 
 # 7. UserSettings
 class UserSettings(Base):
@@ -83,3 +100,5 @@ class UserSettings(Base):
     __table_args__ = (
         CheckConstraint("theme IN ('light', 'dark')", name="theme_check"),
     )
+
+    user = relationship("User", back_populates="settings")
