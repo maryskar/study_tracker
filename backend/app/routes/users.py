@@ -8,23 +8,12 @@ from sqlalchemy.orm import Session
 from app.crud.user import create_user
 from app.database.database import SessionLocal
 
+from app.database.database import get_db
+
 router = APIRouter()
 
-@router.get("/users")
-async def get_users(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(User))
-    return result.scalars().all()
+from app.schemas.user import UserCreate
 
-
-# Функция для получения сессии базы данных
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-# Роут для создания пользователя
 @router.post("/users/")
-def create_user_route(username: str, hashed_password: str, db: Session = Depends(get_db)):
-    return create_user(db=db, username=username, hashed_password=hashed_password)
+def create_user_route(user: UserCreate, db: Session = Depends(get_db)):
+    return create_user(db=db, username=user.username, hashed_password=user.hashed_password)
