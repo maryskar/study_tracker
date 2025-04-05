@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routes import users
+from app.routes import users, auth
 from app.database.database import create_tables
 from fastapi.openapi.utils import get_openapi
 
@@ -16,6 +16,7 @@ async def custom_openapi():
 
 # Подключение роутеров
 app.include_router(users.router)
+app.include_router(auth.router)
 
 # Создание таблиц при запуске приложения
 @app.on_event("startup")
