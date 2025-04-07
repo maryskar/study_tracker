@@ -17,3 +17,6 @@ class RecoverPasswordRequest(BaseModel):
 
 class RecoverPasswordResponse(BaseModel):
     message: str
+
+class RecoverSchema(BaseModel):
+    email: EmailStr

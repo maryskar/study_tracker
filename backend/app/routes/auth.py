@@ -9,7 +9,7 @@ from app.utils.security import create_access_token
 
 from app.schemas.auth import AuthResponse
 
-from app.schemas.auth import RecoverPasswordRequest, RecoverPasswordResponse
+from app.schemas.auth import RecoverPasswordRequest, RecoverPasswordResponse, RecoverSchema
 from app.crud.auth import recover_password
 
 
@@ -50,12 +50,6 @@ async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
 
     return AuthResponse(userId=user.id, token=token)
 
-@router.post("/recover", response_model=RecoverPasswordResponse)
-async def recover_password_route(data: RecoverPasswordRequest, db: AsyncSession = Depends(get_db)):
-    exists = await recover_password(db, data.email)
-    if exists:
-        # Здесь можно будет добавить отправку email с ссылкой
-        return {"message": "Reset link sent"}
-    else:
-        # Чтобы не раскрывать, существует ли email
-        return {"message": "If this email exists, a reset link has been sent"}
+@router.post("/recover")
+async def recover(data: RecoverSchema, db: AsyncSession = Depends(get_db)):
+    return await recover_password(db, data.email)
