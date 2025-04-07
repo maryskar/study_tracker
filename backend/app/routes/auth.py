@@ -4,10 +4,13 @@ from datetime import timedelta
 
 from app.database.database import get_db
 from app.schemas.auth import RegisterRequest, LoginRequest, AuthResponse
-from app.crud.auth import register_user, login_user, get_user_by_email, login_with_google
+from app.crud.auth import register_user, login_user, get_user_by_email
 from app.utils.security import create_access_token
 
 from app.schemas.auth import AuthResponse
+
+from app.schemas.auth import RecoverPasswordRequest, RecoverPasswordResponse
+from app.crud.auth import recover_password
 
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -46,3 +49,13 @@ async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
     )
 
     return AuthResponse(userId=user.id, token=token)
+
+@router.post("/recover", response_model=RecoverPasswordResponse)
+async def recover_password_route(data: RecoverPasswordRequest, db: AsyncSession = Depends(get_db)):
+    exists = await recover_password(db, data.email)
+    if exists:
+        # Здесь можно будет добавить отправку email с ссылкой
+        return {"message": "Reset link sent"}
+    else:
+        # Чтобы не раскрывать, существует ли email
+        return {"message": "If this email exists, a reset link has been sent"}

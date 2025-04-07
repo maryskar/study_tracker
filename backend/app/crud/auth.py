@@ -37,3 +37,8 @@ async def login_user(db: AsyncSession, email: str, password: str):
 
     # Возвращаем объект пользователя
     return user
+
+async def recover_password(db: AsyncSession, email: str) -> bool:
+    result = await db.execute(select(User).where(User.email == email))
+    user = result.scalar_one_or_none()
+    return user is not None
