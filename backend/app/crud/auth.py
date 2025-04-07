@@ -2,7 +2,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.models.models import User
 from app.utils.security import hash_password, verify_password, create_access_token
-from datetime import timedelta
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 

@@ -4,8 +4,11 @@ from datetime import timedelta
 
 from app.database.database import get_db
 from app.schemas.auth import RegisterRequest, LoginRequest, AuthResponse
-from app.crud.auth import register_user, login_user, get_user_by_email
+from app.crud.auth import register_user, login_user, get_user_by_email, login_with_google
 from app.utils.security import create_access_token
+
+from app.schemas.auth import AuthResponse
+
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -43,4 +46,3 @@ async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
     )
 
     return AuthResponse(userId=user.id, token=token)
-
