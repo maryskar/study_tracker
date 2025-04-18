@@ -9,9 +9,6 @@ from app.utils.security import create_access_token
 
 from app.schemas.auth import AuthResponse
 
-from app.schemas.auth import RecoverPasswordRequest, RecoverPasswordResponse, RecoverSchema
-from app.crud.auth import recover_password
-
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -49,7 +46,3 @@ async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
     )
 
     return AuthResponse(userId=user.id, token=token)
-
-@router.post("/recover")
-async def recover(data: RecoverSchema, db: AsyncSession = Depends(get_db)):
-    return await recover_password(db, data.email)

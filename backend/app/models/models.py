@@ -27,7 +27,7 @@ class StudySession(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     start_time = Column(TIMESTAMP, nullable=False)
-    end_time = Column(TIMESTAMP, nullable=True)
+    end_time = Column(TIMESTAMP, nullable=False)
     duration = Column(Integer, nullable=False)
     type = Column(String, nullable=False)
 
