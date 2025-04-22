@@ -23,6 +23,6 @@ git pull origin develop
 Пример успешного выполнения:  
 `Successfully installed customtkinter-5.2.3 matplotlib-3.8.4 requests-2.32.2 ...`
 
-3. Запустите приложение:
-`python main.py`
-*Приложение запустится в графическом интерфейсе (CustomTkinter).*
+3. Запустите приложение:  
+`python main.py`  
+*Приложение запустится в графическом интерфейсе (CustomTkinter).*  
