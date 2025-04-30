@@ -1,4 +1,4 @@
 import unittest
 from database import Database
-from auth import AuthManager
 
+class TestDatabase(unittest.TestCase):
