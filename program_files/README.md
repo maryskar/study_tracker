@@ -8,7 +8,7 @@
 git clone https://github.com/ваш-репозиторий.git  
 cd study_tracker\program_files  
 ```
-**Если репозиторий уже клонировали, то подтяните изменения в ветке develop**  
+**Если репозиторий уже клонировали, то подтяните изменения в ветке develop/main (смотря в какой работаете)**  
 ```
 git pull origin develop  
 ```
