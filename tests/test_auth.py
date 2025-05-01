@@ -1,3 +1,4 @@
+
 import unittest
 from program_files.database import Database
 from program_files.auth import AuthManager
@@ -5,7 +6,7 @@ from jose import jwt
 import datetime
 
 class TestAuthManager(unittest.TestCase):
-    def setUpUser(self):
+    def setUp(self):
         self.db = Database()
         self.db.conn.execute("DELETE FROM users")
         self.db.conn.commit()
@@ -21,11 +22,11 @@ class TestAuthManager(unittest.TestCase):
         login = self.auth.login("bob", "secret")
         self.assertIsInstance(login, dict)
         self.assertIn("token", login)
-        payload = jwt.decode(  # Расшифруем токен и проверим sub
+        payload = jwt.decode(
             login["token"],
             self.auth.SECRET_KEY,
             algorithms=[self.auth.ALGORITHM]
         )
         self.assertEqual(payload["sub"], str(login["id"]))
-        exp = datetime.datetime.fromtimestamp(payload["exp"])  # exp в будущем
-        self.assertGreater(exp, datetime.datetime.utcnow())
+        exp = datetime.datetime.fromtimestamp(payload["exp"], tz=datetime.UTC)
+        self.assertGreater(exp, datetime.datetime.now(datetime.UTC))
