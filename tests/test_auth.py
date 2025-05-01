@@ -1,6 +1,6 @@
 import unittest
-from database import Database
-from auth import AuthManager
+from program_files.database import Database
+from program_files.auth import AuthManager
 from jose import jwt
 import datetime
 

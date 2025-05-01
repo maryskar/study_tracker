@@ -1,4 +1,4 @@
 import unittest
-from database import Database
+from program_files.database import Database
 
 class TestDatabase(unittest.TestCase):
