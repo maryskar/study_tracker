@@ -30,3 +30,10 @@ class TestAuthManager(unittest.TestCase):
         self.assertEqual(payload["sub"], str(login["id"]))
         exp = datetime.datetime.fromtimestamp(payload["exp"], tz=datetime.UTC)
         self.assertGreater(exp, datetime.datetime.now(datetime.UTC))
+
+    def test_login_wrong_password(self):
+        self.auth.register("charlie", "mypassword")
+        self.assertFalse(self.auth.login("charlie", "wrong"))
+
+    def test_login_nonexistent_user(self):
+        self.assertFalse(self.auth.login("no_such_user", "pass"))
