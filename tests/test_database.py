@@ -45,3 +45,12 @@ class TestDatabase(unittest.TestCase):
         april_list = self.db.get_month_sessions(uid, 4, now.year)
         self.assertEqual(len(march_list), 1)
         self.assertEqual(len(april_list), 1)
+
+    def test_achievements(self):
+        self.db.create_user("u3", "h")
+        uid = self.db.get_user("u3")[0]
+        self.db.add_achievement(uid, "First", "First achievement")
+        achs = self.db.get_achievements(uid)
+        self.assertEqual(len(achs), 1)
+        self.assertEqual(achs[0][2], "First")
+        self.assertEqual(achs[0][3], "First achievement")
