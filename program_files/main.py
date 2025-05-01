@@ -1,5 +1,6 @@
 # main.py
 import customtkinter as ctk
+import webbrowser
 from datetime import datetime
 from auth import AuthManager
 from timer import TimerManager
