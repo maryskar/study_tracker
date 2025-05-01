@@ -8,3 +8,9 @@ class TestMotivationAPI(unittest.TestCase):
         mock_resp = mock_get.return_value
         mock_resp.json.return_value = {"content": "Вперёд!"}
         self.assertEqual(MotivationAPI.get_quote(), "Вперёд!")
+
+    @patch("api_client.requests.get", side_effect=Exception("fail"))
+    def test_get_quote_fallback(self, _):
+        quote = MotivationAPI.get_quote()
+        self.assertTrue(isinstance(quote, str))
+        self.assertNotEqual(quote, "")

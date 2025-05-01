@@ -4,7 +4,7 @@ from datetime import datetime
 
 class Database:
     def __init__(self):
-        self.conn = sqlite3.connect('study.db', check_same_thread=False)
+        self.conn = sqlite3.connect('study.db', check_same_thread=False, timeout=10)
         self._init_db()
         
     def _init_db(self):
@@ -36,15 +36,15 @@ class Database:
 
     def create_user(self, username, password_hash):
         try:
-            self.conn.execute(
-                "INSERT INTO users (username, password_hash) VALUES (?, ?)",
-                (username, password_hash)
-            )
-            self.conn.commit()
+            with self.conn:
+                self.conn.execute(
+                    "INSERT INTO users (username, password_hash) VALUES (?, ?)",
+                    (username, password_hash)
+                )
             return True
         except sqlite3.IntegrityError:
             return False
-            
+
     def get_user(self, username):
         cursor = self.conn.execute(
             "SELECT * FROM users WHERE username = ?",

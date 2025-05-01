@@ -7,7 +7,7 @@ class TestDatabase(unittest.TestCase):
         self.db = Database()
         for tbl in ("users", "study_sessions", "achievements"):
             self.db.conn.execute(f"DELETE FROM {tbl}")
-        self.db.conn.commit()
+            self.db.conn.commit()
 
     def test_create_and_get_user(self):
         ok = self.db.create_user("testuser", "hash")
@@ -58,3 +58,7 @@ class TestDatabase(unittest.TestCase):
         self.db.create_user("test", "hash")
         result = self.db.create_user("test", "another_hash")
         self.assertFalse(result)
+
+    def tearDown(self):
+       if hasattr(self, 'db') and self.db.conn:
+           self.db.conn.close()
