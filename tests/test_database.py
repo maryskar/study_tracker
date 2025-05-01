@@ -53,3 +53,24 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(len(achs), 1)
         self.assertEqual(achs[0][2], "First")
         self.assertEqual(achs[0][3], "First achievement")
+
+    def test_create_user_duplicate(self):
+        self.db.create_user("test", "hash")
+        result = self.db.create_user("test", "another_hash")
+        self.assertFalse(result)
+
+    def test_create_session_invalid_data(self):
+        self.db.create_user("user", "hash")
+        user_id = self.db.get_user("user")[0]
+        with self.assertRaises(ValueError):
+            self.db.create_session(user_id, "invalid_date", "invalid_type")
+
+    def test_session_duration_limits(self):
+        self.db.create_user("user", "hash")
+        user_id = self.db.get_user("user")[0]
+        now = datetime.now()
+        sid = self.db.create_session(user_id, now, "pomodoro")
+        with self.assertRaises(ValueError):
+            self.db.update_session(sid, now, -1)  # негативная длительность
+        with self.assertRaises(ValueError):
+            self.db.update_session(sid, now, 86400 + 1)  # больше 24 часов
