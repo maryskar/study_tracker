@@ -37,3 +37,25 @@ Ran 17 tests in 1.194s
 
 OK
 ```
+и подробный результат:
+```
+test_get_quote_fallback (test_api_motivation.TestMotivationAPI.test_get_quote_fallback) ... ok
+test_get_quote_success (test_api_motivation.TestMotivationAPI.test_get_quote_success) ... ok
+test_get_group_info_fallback (test_api_schedule.TestScheduleAPI.test_get_group_info_fallback) ... 
+ok
+test_get_group_info_success (test_api_schedule.TestScheduleAPI.test_get_group_info_success) ... ok
+test_get_group_schedule_fallback (test_api_schedule.TestScheduleAPI.test_get_group_schedule_fallback) ...
+ok
+test_get_group_schedule_success (test_api_schedule.TestScheduleAPI.test_get_group_schedule_success) ... ok
+test_get_formatted_time_fallback (test_api_time.TestWorldTimeAPI.test_get_formatted_time_fallback) ... ok
+test_get_formatted_time_success (test_api_time.TestWorldTimeAPI.test_get_formatted_time_success) ... ok
+test_login_nonexistent_user (test_auth.TestAuthManager.test_login_nonexistent_user) ... ok
+test_login_success_and_token (test_auth.TestAuthManager.test_login_success_and_token) ... ok
+test_login_wrong_password (test_auth.TestAuthManager.test_login_wrong_password) ... ok
+test_register_user_success (test_auth.TestAuthManager.test_register_user_success) ... ok
+test_achievements (test_database.TestDatabase.test_achievements) ... ok
+test_create_and_get_user (test_database.TestDatabase.test_create_and_get_user) ... ok
+test_create_session_and_get (test_database.TestDatabase.test_create_session_and_get) ... ok
+test_create_user_duplicate (test_database.TestDatabase.test_create_user_duplicate) ... ok
+test_month_sessions_filter (test_database.TestDatabase.test_month_sessions_filter) ... ok
+```
