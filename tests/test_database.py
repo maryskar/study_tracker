@@ -26,7 +26,7 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(len(sessions), 1)
         self.assertEqual(sessions[0][0], sid)
         self.assertEqual(sessions[0][2], now)
-        end = (datetime.now() + timedelta(minutes=25)).strftime("%Y-%m-%d %H:%M:%S") # обновляем сессию
+        end = (datetime.now() + timedelta(minutes=25)).strftime("%Y-%m-%d %H:%M:%S")
         self.db.update_session(sid, end, 1500)
         updated = self.db.get_user_sessions(user_id)[0]
         self.assertEqual(updated[3], end)
@@ -35,7 +35,7 @@ class TestDatabase(unittest.TestCase):
     def test_month_sessions_filter(self):
         self.db.create_user("u2", "h")
         uid = self.db.get_user("u2")[0]
-        now = datetime.now()  # создаём две сессии: одна в марте, одна в апреле текущего года
+        now = datetime.now()
         march = now.replace(month=3, day=15).strftime("%Y-%m-%d %H:%M:%S")
         april = now.replace(month=4, day=10).strftime("%Y-%m-%d %H:%M:%S")
         self.db.create_session(uid, march, "stopwatch")
