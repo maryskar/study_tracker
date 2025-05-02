@@ -2,11 +2,10 @@ import unittest
 from unittest.mock import patch, MagicMock
 from program_files.api_client import ScheduleAPI
 from datetime import datetime, timedelta
-import requests  # Добавляем импорт requests
+import requests  
 
 class TestScheduleAPI(unittest.TestCase):
     def setUp(self):
-        # общий шаблон JSON для get_group_schedule
         self.sample = {
             "week": {"date_start": "2025-05-01", "date_end": "2025-05-07", "is_odd": True},
             "days": [
