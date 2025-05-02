@@ -1,4 +1,3 @@
-
 import unittest
 from program_files.database import Database
 from program_files.auth import AuthManager
