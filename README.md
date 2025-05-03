@@ -11,7 +11,10 @@
 Фесенко Иван 5130904/20104  
 
 ## Ссылка на репозиторий:  
-https://github.com/maryskar/study_tracker.git
+https://github.com/maryskar/study_tracker.git  
+**Ознакомиться с файлами реализации:**  
+- Разработки 
+- Тестирования
 
 # Технологический стек
 
