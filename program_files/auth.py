@@ -25,7 +25,7 @@ class AuthManager:
         return False
     
     def create_access_token(self, user_id):
-        expires = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+        expires = datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=24)
         return jwt.encode({
             "sub": str(user_id),
             "exp": expires
