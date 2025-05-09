@@ -17,3 +17,8 @@ def auth(db):
 @pytest.fixture
 def timer(db):
     return TimerManager(db, lambda x: None)
+
+def test_pomodoro_workflow(auth, timer, db):
+    assert auth.register("test_user", "test_pass")
+    
+    assert auth.login("test_user", "test_pass")
