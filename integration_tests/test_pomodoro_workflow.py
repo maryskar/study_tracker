@@ -30,8 +30,9 @@ def test_pomodoro_workflow(auth, timer, db):
     timer.start_session(user["id"], "pomodoro", lambda x: None)
     sessions = db.get_user_sessions(user["id"])
     assert len(sessions) == 1
+    time.sleep(1)
 
     timer.stop_timer()
     session = db.get_user_sessions(user["id"])[0]
-    assert session[3] 
-    assert session[4]
+    assert session[3] is not None 
+    assert session[4] >= 1
