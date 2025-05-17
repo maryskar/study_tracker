@@ -22,9 +22,9 @@ def timer(db):
     return TimerManager(db, lambda x: None)
 
 def test_pomodoro_workflow(auth, timer, db):
-    assert auth.register("test_user", "test_pass")
+    assert auth.register("new_user", "new_pass")
     
-    user = auth.login("test_user", "test_pass")
+    user = auth.login("new_user", "new_pass")
     assert user 
 
     timer.start_session(user["id"], "pomodoro", lambda x: None)
