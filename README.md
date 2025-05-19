@@ -14,7 +14,8 @@
 https://github.com/maryskar/study_tracker.git  
 **Файлы реализации:**  
 - папка разработки [program_files](program_files/); описание [program_files/README.md](program_files/README.md);  
-- папка тестирования [tests](tests/); описание [tests/README.md](tests/README.md);  
+- папка тестирования [tests](tests/); описание [tests/README.md](tests/README.md);
+  
 **Отчет по проекту:** [ОТЧЕТ ПДФ](Потапова_Скарлыгина_Чулков_Фесенко_5130904_20104.pdf)  
   
 # Технологический стек
