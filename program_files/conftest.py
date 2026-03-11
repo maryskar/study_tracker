@@ -1,4 +1,6 @@
+﻿import os
 import sys
-import os
 
-sys.path.append(os.path.join(os.path.dirname(__file__), 'program_files'))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
+if PROJECT_ROOT not in sys.path:
+    sys.path.append(PROJECT_ROOT)

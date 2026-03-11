@@ -1,4 +1,4 @@
-﻿from datetime import datetime, timedelta, UTC
+﻿from datetime import datetime, timedelta, timezone
 
 import pytest
 from jose import jwt
@@ -68,7 +68,7 @@ def test_login_rejects_wrong_password(auth_manager, username, correct_password, 
     assert auth_manager.login(username, wrong_password) is False
 
 
-@pytest.mark.parametrize("username", ["missing_1", "missing_2"])
+@pytest.mark.parametrize("username", ["missing_1", "missing_2", "missing_3", "missing_4"])
 def test_login_unknown_user_returns_false(auth_manager, username):
     assert auth_manager.login(username, "any_password") is False
 
@@ -84,8 +84,8 @@ def test_create_access_token_contains_user_id_and_expiration(auth_manager, user_
 
     assert payload["sub"] == str(user_id)
 
-    exp = datetime.fromtimestamp(payload["exp"], tz=UTC)
-    now = datetime.now(UTC)
+    exp = datetime.fromtimestamp(payload["exp"], tz=timezone.utc)
+    now = datetime.now(timezone.utc)
     assert exp > now
     assert exp <= now + timedelta(hours=25)
 
@@ -98,4 +98,3 @@ def test_register_hashes_password(auth_manager, isolated_db):
     assert user is not None
     assert user[2] != raw_password
     assert raw_password not in user[2]
-
