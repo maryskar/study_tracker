@@ -1,0 +1,19 @@
+# Python cache / bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Test cache
+.pytest_cache/
+
+# Coverage artifacts
+.coverage
+coverage.xml
+pytest-report.xml
+unit-junit.xml
+integration-junit.xml
+
+# Virtual environments
+.venv/
+venv/
+env/

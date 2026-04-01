@@ -1,1 +1,10 @@
-[run]source =    program_filesomit =    program_files/main.py    program_files/conftest.py[report]skip_empty = Trueshow_missing = True
+[run]
+source =
+    program_files
+omit =
+    program_files/main.py
+    program_files/conftest.py
+
+[report]
+skip_empty = True
+show_missing = True
