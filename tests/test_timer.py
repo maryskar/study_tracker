@@ -6,7 +6,7 @@ import pytest
 import program_files.timer as timer_module
 
 
-@pytest.mark.parametrize("mode", ["pomodoro", "short_break", "long_break", "pomodoro"])
+@pytest.mark.parametrize("mode", ["pomodoro", "short_break", "long_break"])
 def test_start_session_adds_timer_job_for_countdown(timer_manager, mock_db, mode):
     ui_callback = MagicMock()
     timer_manager.start_session(user_id=7, mode=mode, update_ui=ui_callback)
@@ -16,8 +16,6 @@ def test_start_session_adds_timer_job_for_countdown(timer_manager, mock_db, mode
     assert timer_manager.session_id == 101
     assert timer_manager.scheduler.jobs[-1]["func"] == timer_manager._update_timer
 
-
-@pytest.mark.parametrize("mode", ["stopwatch", "stopwatch", "stopwatch", "stopwatch"])
 def test_start_session_adds_stopwatch_job(timer_manager, mock_db, mode):
     ui_callback = MagicMock()
     timer_manager.start_session(user_id=11, mode=mode, update_ui=ui_callback)
