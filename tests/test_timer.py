@@ -40,6 +40,20 @@ def test_update_timer_sends_remaining_time(timer_manager, elapsed_seconds):
     assert len(rendered) == 5
     assert ":" in rendered
 
+@pytest.mark.parametrize("elapsed_seconds", [0, -5, -30])
+def  test_update_timer_sends_negative_time(timer_manager, elapsed_seconds):
+    timer_manager.current_mode = "pomodoro"
+    timer_manager.running = True
+    timer_manager.app_running = True
+    timer_manager.start_time = datetime.now() - timedelta(seconds=elapsed_seconds)
+
+    update_ui = MagicMock()
+    timer_manager._update_timer(update_ui)
+
+    update_ui.assert_called_once()
+    rendered = update_ui.call_args.args[0]
+    assert len(rendered) == 5
+    assert ":" in rendered
 
 @pytest.mark.parametrize("elapsed_seconds", [1500, 1600, 2000])
 def test_update_timer_completes_when_time_expires(timer_manager, elapsed_seconds, monkeypatch):
