@@ -1,4 +1,4 @@
-﻿from datetime import datetime
+from datetime import datetime
 
 import pytest
 
@@ -19,23 +19,6 @@ def test_create_user_persists_user(isolated_db, username, password_hash):
     user = isolated_db.get_user(username)
     assert user is not None
     assert user[1] == username
-
-
-@pytest.mark.parametrize(
-    "username,password_hash",
-    [
-        (None, "hash"),
-        ("user_none_hash", None),
-        (None, None),
-    ],
-)
-def test_create_user_invalid_data_returns_false(isolated_db, username, password_hash):
-    assert isolated_db.create_user(username, password_hash) is False
-
-
-@pytest.mark.parametrize("username", ["ghost_1", "ghost_2"])
-def test_get_user_returns_none_for_missing_user(isolated_db, username):
-    assert isolated_db.get_user(username) is None
 
 
 @pytest.mark.parametrize(
@@ -159,12 +142,6 @@ def test_get_month_sessions_isolated_by_user(isolated_db, month):
         assert len(result_a) == 0
 
 
-def test_get_achievements_empty_returns_empty_list(isolated_db):
-    isolated_db.create_user("empty_ach", "hash")
-    user_id = isolated_db.get_user("empty_ach")[0]
-    assert isolated_db.get_achievements(user_id) == []
-
-
 def test_create_and_update_session_full_flow(isolated_db):
     isolated_db.create_user("flow_user", "hash")
     user_id = isolated_db.get_user("flow_user")[0]
@@ -180,4 +157,3 @@ def test_create_and_update_session_full_flow(isolated_db):
     assert session[3] == end_time
     assert session[4] == 1500
     assert session[5] == "pomodoro"
-
