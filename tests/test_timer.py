@@ -3,6 +3,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
+import program_files.timer as timer_module
+
 
 @pytest.mark.parametrize("mode", ["pomodoro", "short_break", "long_break"])
 def test_start_session_adds_timer_job_for_countdown(timer_manager, mock_db, mode):
@@ -24,7 +26,7 @@ def test_start_session_adds_stopwatch_job(timer_manager, mock_db):
     assert timer_manager.scheduler.jobs[-1]["func"] == timer_manager._update_stopwatch
 
 
-@pytest.mark.parametrize("elapsed_seconds", [1, 1500])
+@pytest.mark.parametrize("elapsed_seconds", [1])
 def test_update_timer_sends_remaining_time(timer_manager, elapsed_seconds):
     timer_manager.current_mode = "pomodoro"
     timer_manager.running = True
@@ -38,6 +40,22 @@ def test_update_timer_sends_remaining_time(timer_manager, elapsed_seconds):
     rendered = update_ui.call_args.args[0]
     assert len(rendered) == 5
     assert ":" in rendered
+
+
+def test_update_timer_completes_session_when_time_over(timer_manager, monkeypatch):
+    timer_manager.current_mode = "pomodoro"
+    timer_manager.running = True
+    timer_manager.app_running = True
+    timer_manager.start_time = datetime.now() - timedelta(seconds=1500)
+
+    complete_session = MagicMock()
+    monkeypatch.setattr(timer_manager, "_complete_session", complete_session)
+
+    update_ui = MagicMock()
+    timer_manager._update_timer(update_ui)
+
+    update_ui.assert_not_called()
+    complete_session.assert_called_once()
 
 
 @pytest.mark.parametrize("elapsed_seconds", [0, -5])
@@ -54,6 +72,7 @@ def test_update_timer_sends_negative_time(timer_manager, elapsed_seconds):
     rendered = update_ui.call_args.args[0]
     assert len(rendered) == 5
     assert ":" in rendered
+
 
 @pytest.mark.parametrize("elapsed_seconds", [1, 10])
 def test_update_stopwatch_formats_elapsed_time(timer_manager, elapsed_seconds):
@@ -114,6 +133,7 @@ def test_stop_timer_updates_session_and_clears_jobs(timer_manager, mock_db, dura
     assert timer_manager.running is False
     mock_db.update_session.assert_called_once()
     assert timer_manager.scheduler.remove_all_jobs_calls == 1
+
 
 @pytest.mark.parametrize("running,app_running", [(False, True), (True, False)])
 def test_update_timer_skips_when_not_active(timer_manager, running, app_running):
