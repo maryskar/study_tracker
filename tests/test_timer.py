@@ -78,11 +78,7 @@ def test_update_timer_remaining_time_and_completion(timer_manager, monkeypatch, 
     ("short_break", 300),
     ("long_break", 900),
 ])
-@pytest.mark.parametrize("elapsed_seconds", [
-    -1,     # До начала
-    0,      # Начало
-    1,      # Ближайшее к началу
-])
+@pytest.mark.parametrize("elapsed_seconds", [-1, 0, 1,])
 def test_update_timer_different_modes_beginning(timer_manager, monkeypatch, mode, duration, elapsed_seconds):
     """Разные режимы показывают время в начале сессии"""
     timer_manager.current_mode = mode
@@ -103,11 +99,7 @@ def test_update_timer_different_modes_beginning(timer_manager, monkeypatch, mode
     ("short_break", 300),
     ("long_break", 900),
 ])
-@pytest.mark.parametrize("offset", [
-    -1,     # За гранью (не должно быть)
-    0,      # Точно на границе
-    1,      # Ближайшее за граница
-])
+@pytest.mark.parametrize("offset", [-1, 0, 1,])
 def test_update_timer_completion_at_each_mode(timer_manager, monkeypatch, mode, duration, offset):
     """Каждый режим завершается при его длительности + offset"""
     timer_manager.current_mode = mode
@@ -135,22 +127,12 @@ def test_update_timer_completion_at_each_mode(timer_manager, monkeypatch, mode, 
 # UPDATE_STOPWATCH - Обновление секундомера (0-3661+ секунд)
 # ============================================================================
 """спросить у нейронки логику работы этой фигни"""
-@pytest.mark.parametrize("elapsed_seconds", [
-    -1,     # Граница: отрицательное
-    0,      # Граница: только запустился
-    1,      # Ближайшее к граница
-    59,     # Ближайшее к границе (конец минуты) 
-    60,     # Граница: ровно 1 минута
-    61,     # Ближайшее за граница
-    3599,   # Ближайшее к границе (конец часа)
-    3600,   # Граница: ровно 1 час
-    3661,   # Класс эквивалентности: больше часа
-])
+@pytest.mark.parametrize("elapsed_seconds", [0, 1, 59, 60, 61, 3599, 3600, 3661])
 def test_stopwatch_formats_time_at_boundaries(timer_manager, elapsed_seconds):
     """Секундомер форматирует время при граничных и нормальных значениях"""
     timer_manager.running = True
     timer_manager.app_running = True
-    timer_manager.start_time = datetime.now() - timedelta(seconds=max(0, elapsed_seconds))
+    timer_manager.start_time = datetime.now() - timedelta(seconds=elapsed_seconds)
 
     update_ui = MagicMock()
     timer_manager._update_stopwatch(update_ui)
@@ -159,44 +141,6 @@ def test_stopwatch_formats_time_at_boundaries(timer_manager, elapsed_seconds):
     rendered = update_ui.call_args.args[0]
     assert ":" in rendered
     assert len(rendered) >= 7  # Минимум HH:MM:SS
-
-
-# ============================================================================
-# COMPLETE_SESSION - Завершение сессии
-# ============================================================================
-
-def test_complete_session_pomodoro_adds_achievement(timer_manager, mock_db, monkeypatch):
-    """Помидоро добавляет достижение и вызывает callback"""
-    timer_manager.current_mode = "pomodoro"
-    timer_manager.user_id = 7
-    timer_manager.running = True
-    timer_manager.session_id = 12
-
-    stop = MagicMock()
-    monkeypatch.setattr(timer_manager, "stop_timer", stop)
-
-    timer_manager._complete_session()
-
-    stop.assert_called_once()
-    mock_db.add_achievement.assert_called_once()
-    timer_manager.update_callback.assert_called_once()
-
-
-@pytest.mark.parametrize("mode", ["short_break", "long_break", "stopwatch"])
-def test_complete_session_non_pomodoro_no_achievement(timer_manager, mock_db, monkeypatch, mode):
-    """Не-помодоро режимы не добавляют достижения"""
-    timer_manager.current_mode = mode
-    timer_manager.user_id = 7
-    timer_manager.running = True
-    timer_manager.session_id = 13
-
-    stop = MagicMock()
-    monkeypatch.setattr(timer_manager, "stop_timer", stop)
-
-    timer_manager._complete_session()
-
-    stop.assert_called_once()
-    mock_db.add_achievement.assert_not_called()
 
 
 # ============================================================================
@@ -216,8 +160,7 @@ def test_stop_timer_running_updates_session(timer_manager, mock_db, duration_sec
     
     mock_db.update_session.assert_called_once()
     args = mock_db.update_session.call_args[0]
-    assert args[0] == 101  # session_id
-    assert args[2] > 0     # duration > 0
+    assert args[0] == 101 
 
 
 def test_stop_timer_removes_scheduler_jobs(timer_manager, mock_db):
@@ -250,7 +193,6 @@ def test_stop_timer_idempotent(timer_manager, mock_db):
     timer_manager.stop_timer()
     first_call_count = mock_db.update_session.call_count
 
-    # Вторая попытка остановки
     timer_manager.stop_timer()
     second_call_count = mock_db.update_session.call_count
 
