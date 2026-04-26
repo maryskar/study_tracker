@@ -12,6 +12,14 @@ def test_register_rejects_empty_credentials(auth_manager):
     assert auth_manager.register("user", "   ") is False
 
 
+def test_register_returns_false_when_password_hashing_fails(auth_manager, monkeypatch):
+    def broken_hash(_password):
+        raise RuntimeError("hash failed")
+
+    monkeypatch.setattr(auth_manager.pwd_context, "hash", broken_hash)
+    assert auth_manager.register("user", "pass1") is False
+
+
 def test_login_rejects_wrong_password(auth_manager):
     auth_manager.register("neg_user", "correct1")
     assert auth_manager.login("neg_user", "wrong1") is False
