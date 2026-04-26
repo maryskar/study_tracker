@@ -52,13 +52,13 @@ class TimerManager:
 
     def _update_timer(self, update_ui):
         if self.running and self.app_running:
-            elapsed = datetime.now() - self.start_time
-            remaining = self.MODES[self.current_mode] - elapsed.seconds
-            
+            elapsed = int((datetime.now() - self.start_time).total_seconds())
+            remaining = self.MODES[self.current_mode] - elapsed
+
             if remaining <= 0:
                 self._complete_session()
                 return
-                
+
             mins, secs = divmod(remaining, 60)
             update_ui(f"{mins:02d}:{secs:02d}")
 
