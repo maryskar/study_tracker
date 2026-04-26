@@ -1,3 +1,6 @@
+import pytest
+
+
 def test_register_rejects_duplicate_username(auth_manager):
     username = "dup_user"
 
@@ -5,11 +8,17 @@ def test_register_rejects_duplicate_username(auth_manager):
     assert auth_manager.register(username, "pass2") is False
 
 
-def test_register_rejects_empty_credentials(auth_manager):
-    assert auth_manager.register("", "pass1") is False
-    assert auth_manager.register("user", "") is False
-    assert auth_manager.register("   ", "pass1") is False
-    assert auth_manager.register("user", "   ") is False
+@pytest.mark.parametrize(
+    "username,password",
+    [
+        ("", "pass1"),
+        ("user", ""),
+        ("   ", "pass1"),
+        ("user", "   "),
+    ],
+)
+def test_register_rejects_invalid_credentials(auth_manager, username, password):
+    assert auth_manager.register(username, password) is False
 
 
 def test_register_returns_false_when_password_hashing_fails(auth_manager, monkeypatch):
@@ -20,20 +29,26 @@ def test_register_returns_false_when_password_hashing_fails(auth_manager, monkey
     assert auth_manager.register("user", "pass1") is False
 
 
-def test_login_rejects_wrong_password(auth_manager):
-    auth_manager.register("neg_user", "correct1")
-    assert auth_manager.login("neg_user", "wrong1") is False
+@pytest.mark.parametrize(
+    "username,correct_password,wrong_password",
+    [
+        ("neg_user_1", "correct1", "wrong1"),
+        ("neg_user_2", "correct2", "wrong2"),
+        ("neg_user_3", "correct3", "wrong3"),
+    ],
+)
+def test_login_rejects_wrong_password(auth_manager, username, correct_password, wrong_password):
+    auth_manager.register(username, correct_password)
+    assert auth_manager.login(username, wrong_password) is False
 
 
-def test_login_unknown_user_returns_false(auth_manager):
-    assert auth_manager.login("missing_user", "any_password") is False
+@pytest.mark.parametrize("username", ["missing_user_1", "missing_user_2"])
+def test_login_unknown_user_returns_false(auth_manager, username):
+    assert auth_manager.login(username, "any_password") is False
 
 
-def test_login_rejects_empty_credentials(auth_manager):
+def test_login_rejects_invalid_credentials(auth_manager):
     assert auth_manager.login("", "pass1") is False
-    assert auth_manager.login("user", "") is False
-    assert auth_manager.login("   ", "pass1") is False
-    assert auth_manager.login("user", "   ") is False
 
 
 def test_login_returns_false_for_invalid_stored_hash(auth_manager, isolated_db):
