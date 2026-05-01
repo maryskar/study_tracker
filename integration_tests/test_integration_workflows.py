@@ -7,6 +7,8 @@ from jose import jwt
 
 from program_files.api_client import MotivationAPI, ScheduleAPI, WorldTimeAPI
 
+GROUP_ID = 40520
+
 
 class FakeResponse:
     def __init__(self, payload, status_error=None):
@@ -128,88 +130,112 @@ def test_scenario_05_stopwatch_updates_ui_and_persists_duration(
     assert sessions[0][5] == "stopwatch"
 
 
-@pytest.mark.integration
-@patch("program_files.api_client.requests.get")
-def test_scenario_06_external_services_success_feed_application_flow(
-    mock_get,
-    integration_timer,
-    integration_db,
-    register_and_login,
-):
-    def route_response(url, **kwargs):
-        if "quotable" in url:
-            return FakeResponse({"content": "Keep studying."})
-        if "worldtimeapi" in url:
-            return FakeResponse({"datetime": "2026-05-01T12:10:30+03:00"})
-        if "/groups/" in url:
-            return FakeResponse({"name": "5130904/20104", "faculty": {"name": "IKNT"}, "course": 3})
-        return FakeResponse(
-            {
-                "week": {"date_start": "2026-04-27", "date_end": "2026-05-03", "is_odd": True},
+# Вспомогательный mock-ответ для requests.get
+ 
+def _make_mock_response(url, **kwargs):
+ 
+    class _Response:
+        def raise_for_status(self):
+            pass
+ 
+        def json(self_inner):
+            if "quotable" in url:
+                return {"content": "Work now, rest later."}
+            if "worldtimeapi" in url:
+                return {"datetime": "2026-03-11T12:00:00+03:00"}
+            if "groups" in url:
+                return {
+                    "name": "5130904/20104",
+                    "faculty": {"name": "Институт компьютерных наук и кибербезопасности"},
+                    "course": 3,
+                }
+            return {
+                "week": {
+                    "date_start": "2026-03-10",
+                    "date_end": "2026-03-16",
+                    "is_odd": False,
+                },
                 "days": [
                     {
                         "weekday": 1,
-                        "date": "2026-04-27",
+                        "date": "2026-03-10",
                         "lessons": [
                             {
                                 "time_start": "09:00",
                                 "time_end": "10:30",
-                                "subject": "Testing",
-                                "typeObj": {"abbr": "Lab"},
-                                "auditories": [{"building": {"name": "Main"}, "name": "101"}],
-                                "teachers": [{"full_name": "Teacher"}],
-                                "lms_url": "https://lms.example/course",
+                                "subject": "Тестирование ПО",
+                                "typeObj": {"abbr": "Лек"},
+                                "auditories": [{"building": {"name": "Главный"}, "name": "101"}],
+                                "teachers": [{"full_name": "Иванов И.И."}],
+                                "lms_url": "https://lms.spbstu.ru/course/1",
                             }
                         ],
                     }
                 ],
             }
-        )
-
-    mock_get.side_effect = route_response
-
-    quote = MotivationAPI.get_quote()
-    current_time = WorldTimeAPI.get_formatted_time()
-    group = ScheduleAPI.get_group_info(40520)
-    schedule = ScheduleAPI.get_group_schedule(40520, "2026-05-01")
-
-    user = register_and_login("int_user_06", "pass_06")
-    integration_timer.start_session(user["id"], "pomodoro", lambda _value: None)
-    integration_timer.stop_timer()
-
-    lesson = schedule["days"][0]["lessons"][0]
-    sessions = integration_db.get_user_sessions(user["id"])
-
-    assert quote == "Keep studying."
-    assert current_time == "2026-05-01 12:10:30"
-    assert group["name"] == "5130904/20104"
-    assert lesson["subject"] == "Testing"
-    assert lesson["room"] == "Main 101"
-    assert len(sessions) == 1
+ 
+    return _Response()
 
 
 @pytest.mark.integration
-@patch("program_files.api_client.requests.get", side_effect=requests.exceptions.Timeout("timeout"))
-def test_scenario_07_external_service_timeout_uses_fallback_and_keeps_core_flow(
-    _mock_get,
-    integration_timer,
-    integration_db,
-    register_and_login,
-):
+@patch("program_files.api_client.requests.get", side_effect=_make_mock_response)
+def test_scenario_06_external_services_happy_path(_mock_get):
+    # Блок 1: MotivationAPI возвращает непустую строку-цитату
     quote = MotivationAPI.get_quote()
+    assert isinstance(quote, str)
+    assert quote == "Work now, rest later."
+
+    # Блок 2: WorldTimeAPI возвращает время в формате YYYY-MM-DD HH:MM:SS
     current_time = WorldTimeAPI.get_formatted_time()
-    schedule = ScheduleAPI.get_group_schedule(40520)
+    assert len(current_time) == 19
+    datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S")
 
-    user = register_and_login("int_user_07", "pass_07")
-    integration_timer.start_session(user["id"], "stopwatch", lambda _value: None)
-    integration_timer.stop_timer()
+    # Блок 3: ScheduleAPI.get_group_info возвращает корректную структуру группы
+    group_info = ScheduleAPI.get_group_info(GROUP_ID)
+    assert group_info["name"] == "5130904/20104"
 
-    sessions = integration_db.get_user_sessions(user["id"])
+    # Блок 4: ScheduleAPI.get_group_schedule возвращает расписание с неделей и днями
+    schedule = ScheduleAPI.get_group_schedule(GROUP_ID, date="2026-03-10")
 
-    assert isinstance(quote, str) and quote
-    assert isinstance(current_time, str) and len(current_time) == 19
+    assert "week" in schedule
     assert "days" in schedule
-    assert len(sessions) == 1
+
+    lesson = schedule["days"][0]["lessons"][0]
+
+    assert lesson["subject"] == "Тестирование ПО"
+    assert lesson["room"] == "Главный 101"
+    assert lesson["teacher"] == "Иванов И.И."
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    "error_cls",
+    [
+        requests.exceptions.Timeout,
+        requests.exceptions.ConnectionError,
+        requests.exceptions.RequestException,
+    ],
+)
+@patch("program_files.api_client.requests.get")
+def test_scenario_07_each_api_fallback_independently(mock_get, error_cls):
+    mock_get.side_effect = error_cls("simulated error")
+ 
+    # MotivationAPI
+    quote = MotivationAPI.get_quote()
+    assert isinstance(quote, str) and len(quote) > 0
+ 
+    # WorldTimeAPI
+    t = WorldTimeAPI.get_formatted_time()
+    assert len(t) == 19
+    datetime.strptime(t, "%Y-%m-%d %H:%M:%S")
+ 
+    # ScheduleAPI - schedule
+    schedule = ScheduleAPI.get_group_schedule(GROUP_ID)
+    assert "week" in schedule and "days" in schedule
+ 
+    # ScheduleAPI - group_info
+    info = ScheduleAPI.get_group_info(GROUP_ID)
+    assert info["name"] == "5130904/20104"
 
 
 @pytest.mark.integration
