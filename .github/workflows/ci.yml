@@ -26,7 +26,7 @@ jobs:
 
       - name: Run unit tests with coverage gate
         run: |
-          python -m pytest tests --cov=program_files --cov-config=.coveragerc --cov-fail-under=80 --cov-report=term-missing --cov-report=xml --junitxml=unit-junit.xml
+          python -m pytest unit_tests --cov=program_files --cov-config=.coveragerc --cov-fail-under=80 --cov-report=term-missing --cov-report=xml --junitxml=unit-junit.xml
 
       - name: Upload unit reports
         uses: actions/upload-artifact@v4
