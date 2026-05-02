@@ -96,8 +96,9 @@ def test_e2e_05_happy_path_external_services(mock_get, e2e_auth, e2e_timer, e2e_
 
     quote = MotivationAPI.get_quote()
     current_time = WorldTimeAPI.get_formatted_time()
-    group = ScheduleAPI.get_group_info(40520)
-    schedule = ScheduleAPI.get_group_schedule(40520, "2026-04-01")
+    group_number = 40520
+    group = ScheduleAPI.get_group_info(group_number)
+    schedule = ScheduleAPI.get_group_schedule(group_number, "2026-04-01")
 
     assert quote == "Study hard."
     assert current_time.startswith("2026-04-01")
@@ -116,8 +117,9 @@ def test_e2e_05_happy_path_external_services(mock_get, e2e_auth, e2e_timer, e2e_
 def test_e2e_06_fallback_path_external_services(_mock_get):
     quote = MotivationAPI.get_quote()
     current_time = WorldTimeAPI.get_formatted_time()
-    group = ScheduleAPI.get_group_info(40520)
-    schedule = ScheduleAPI.get_group_schedule(40520)
+    group_number = 40520
+    group = ScheduleAPI.get_group_info(group_number)
+    schedule = ScheduleAPI.get_group_schedule(group_number)
 
     assert isinstance(quote, str) and quote != ""
     assert isinstance(current_time, str) and len(current_time) == 19
